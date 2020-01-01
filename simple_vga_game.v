@@ -22,7 +22,7 @@ module simple_vga_game (
 	reg[9:0] head_left_init, head_right_init, head_top_init, head_bottom_init; 	  
 	reg[9:0] head_left, head_right, head_top, head_bottom; 
 	   
-	reg[9:0] body_left[12], body_right[12], body_top[12], body_bottom[12]; 
+	reg[9:0] body_left[20], body_right[20], body_top[20], body_bottom[20]; 
 	
 	reg[9:0] food_left,food_right,food_top,food_bottom;
 	reg[9:0] food_left_init, food_right_init, food_top_init, food_bottom_init; 
@@ -119,8 +119,8 @@ module simple_vga_game (
 		
 	//refresh head pos
 	
-			reg [8:0] temp1;  //for循环变量 
-	always@(posedge clk_25M) 
+   reg [8:0] temp1;  //for循环变量 
+	always@(posedge(clk_200ms))
 			begin
 			 //body  
 			for( temp1= 0 ; temp1 + 1< body_num ; temp1=temp1+1'b1 ) 
@@ -157,7 +157,7 @@ module simple_vga_game (
 			end
 			
 	reg[31:0] score;
-	reg [2:0] body_num;
+	reg [3:0] body_num;
 	
 	//detect collision
 	always@(posedge(clk_200ms))
