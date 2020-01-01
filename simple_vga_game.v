@@ -22,7 +22,7 @@ module simple_vga_game (
 	reg[9:0] head_left_init, head_right_init, head_top_init, head_bottom_init; 	  
 	reg[9:0] head_left, head_right, head_top, head_bottom; 
 	   
-	reg[9:0] body_left[10], body_right[10], body_top[10], body_bottom[10]; 
+	reg[9:0] body_left[12], body_right[12], body_top[12], body_bottom[12]; 
 	
 	reg[9:0] food_left,food_right,food_top,food_bottom;
 	reg[9:0] food_left_init, food_right_init, food_top_init, food_bottom_init; 
@@ -119,15 +119,25 @@ module simple_vga_game (
 		
 	//refresh head pos
 	
-	reg [8:0] temp1;  //for循环变量
+			reg [8:0] temp1;  //for循环变量 
 	always@(posedge clk_25M) 
 			begin
-			 if(body_num ==1)
+			 //body  
+			for( temp1= 0 ; temp1 + 1< body_num ; temp1=temp1+1'b1 ) 
+				   //循环次数固定
+				begin 
+					body_left[temp1+1'b1] <= body_left[temp1];
+					body_right[temp1+1'b1] <= body_right[temp1] ;
+					body_bottom[temp1+1'b1] <= body_bottom[temp1];
+					body_top[temp1+1'b1] <= body_top[temp1] ;
+				end
+				
+			if(body_num >=1)
 				begin
-					body_left[0] = head_left;
-					body_right[0] = head_right;
-					body_top[0] = head_top;
-					body_bottom[0] = head_bottom; 
+					body_left[0]  <=  head_left;
+					body_right[0] <=  head_right;
+					body_top[0]  <=  head_top;
+					body_bottom[0]  <=  head_bottom; 
 				end
 				
 			//head
@@ -142,18 +152,9 @@ module simple_vga_game (
 			food_right <= food_right_init ;
 			food_top <= food_top_init;
 			food_bottom <= food_bottom_init;
-			 
-		
 			
-			//body  
-			for( temp1= 0 ; temp1< body_num ; temp1=temp1+1'b1 ) 
-				   //循环次数固定
-				body_left[temp1+1'b1]  <= 	body_left[temp1];
-				body_right[temp1+1'b1] <= body_right[temp1] ;
-				body_bottom[temp1+1'b1] <= 	body_bottom[temp1];
-				body_top[temp1+1'b1] <= 	body_top[temp1] ;
+			
 			end
-  
 			
 	reg[31:0] score;
 	reg [2:0] body_num;
@@ -166,13 +167,13 @@ module simple_vga_game (
 					score = score + 1;
 				
 				//food relocation
-				food_left_init <= (food_left_init + 10'd180) % 10'd640;
-				food_right_init <= (food_right_init + 10'd180) % 10'd640;
-				food_top_init <= (food_top_init + 10'd80) % 10'd480;
-				food_bottom_init <= (food_bottom_init + 10'd80) % 10'd480;
-				
-				//add body  
-				body_num = body_num+1;
+					food_left_init <= (food_left_init + 10'd180) % 10'd640;
+					food_right_init <= (food_right_init + 10'd180) % 10'd640;
+					food_top_init <= (food_top_init + 10'd80) % 10'd480;
+					food_bottom_init <= (food_bottom_init + 10'd80) % 10'd480;
+					
+					//add body  
+					body_num = body_num+1;
 				end
 			end
 	
@@ -202,23 +203,14 @@ module simple_vga_game (
 	//game over
 	integer k;
 	reg finish;
+	 
 	
-	//assign color
-	integer i;
+   reg [8:0] temp2;  //for循环变量 
 	always@(posedge clk_25M)
 	begin
 		if (finish == 0)
 		begin 
-			//head
-			for( temp1=0 ; temp1< body_num ; temp1=temp1+1'b1 ) 
-			if( Hcnt >= body_left[temp1] && Hcnt <  body_right[temp1] 
-				&& Vcnt >= body_top[temp1] && Vcnt <  body_bottom[temp1])
-			begin 
-				VGA_R = 8'd280;
-				VGA_G = 8'd190;
-				VGA_B = 8'd190;
-			end
-			
+			//head 
 		   if (Hcnt >= head_left && Hcnt < head_right 
 				&& Vcnt >= head_top && Vcnt < head_bottom)
 			begin
@@ -234,13 +226,29 @@ module simple_vga_game (
 					VGA_G = 8'd169;
 					VGA_B = 8'd105;
 				end  
-			else
-			begin
-				//sky  
-					VGA_R = 8'd135;
-					VGA_G = 8'd206;
-					VGA_B = 8'd250; 
-			end
+			else  
+				begin
+				
+					//sky  
+						VGA_R = 8'd135;
+						VGA_G = 8'd206;
+						VGA_B = 8'd250; 
+					
+					//body
+						if(body_num >=1)
+							begin
+								for( temp2 = 0 ; temp2< body_num ; temp2=temp2+1'b1 ) 
+									begin
+										if( Hcnt >= body_left[temp2] && Hcnt <  body_right[temp2] 
+											&& Vcnt >= body_top[temp2] && Vcnt <  body_bottom[temp2])
+												begin 
+											 	VGA_R = 8'd210;
+											 	VGA_G = 8'd80;
+												VGA_B = 8'd80;
+												end
+									end 	
+							end 
+				end
 		end
 		//game over
 		else
