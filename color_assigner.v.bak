@@ -1,0 +1,12 @@
+module color_assigner(
+	input reg[9:0] Hcnt,
+	input reg[9:0] Vcnt,
+	input reg[9:0] birdhead_left, birdhead_right, birdhead_top, birdhead_bottom,
+	input reg[9:0] birdbody_left, birdbody_right, birdbody_top, birdbody_bottom,
+	input reg[9:0] birdleg_left, birdleg_right, birdleg_top, birdleg_bottom,
+	output[7:0] Red;
+	output[7:0] Green;
+	output[7:0] Blue;
+);
+
+endmodule
